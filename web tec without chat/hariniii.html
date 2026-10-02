@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Pro - 20+ Premium Parking Slots</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4CAF50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196F3;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            background: var(--dark-bg);
+            color: white;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        body.dark-mode .navbar {
+            background: #16213e;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .parking-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .parking-card {
+            background: #16213e;
+        }
+
+        .parking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .parking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .slot-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .status-booked {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+
+        body.dark-mode .form-container {
+            background: #16213e;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #0f3460;
+            border-color: #16213e;
+            color: white;
+        }
+
+        .alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .alert-error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .stat-card {
+            background: #16213e;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .modal-content {
+            background: #16213e;
+        }
+
+        .demo-credentials {
+            background: #e8f5e9;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .referral-code-box {
+            background: var(--gradient-primary);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: white;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .leaderboard-item {
+            border-bottom-color: #0f3460;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; border-radius: 10px; margin: 5px 0; padding: 10px; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #333; border-radius: 10px; margin: 5px 0; padding: 10px; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: white; border-radius: 10px; margin: 5px 0; padding: 10px; }
+
+        .subscription-plan {
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .subscription-plan:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .subscription-plan.popular {
+            border-color: var(--warning-color);
+            position: relative;
+        }
+
+        .subscription-plan.popular::before {
+            content: '🔥 POPULAR';
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--warning-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .ai-insight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .weather-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            margin: 0.5rem;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #333;
+        }
+
+        .badge-locked {
+            background: #95a5a6;
+            color: white;
+            opacity: 0.6;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 0.5s ease;
+        }
+
+        .qr-code {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .qr-code canvas {
+            margin: 1rem auto;
+        }
+
+        .page-title {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .filter-section select {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .parking-grid {
+                grid-template-columns: 1fr;
+            }
+            .filter-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🚗 SmartPark Pro | 20+ Premium Parking Slots</div>
+            <div class="nav-links">
+                <a onclick="showPage('dashboard')">🏠 Dashboard</a>
+                <a onclick="showPage('parking')">🅿️ Parking (20 Slots)</a>
+                <a onclick="showPage('bookings')">📅 Bookings</a>
+                <a onclick="showPage('profile')">👤 Profile</a>
+                <a onclick="showPage('achievements')">🏆 Achievements</a>
+                <a onclick="showPage('referrals')">🎁 Referrals</a>
+                <a onclick="showPage('leaderboard')">📊 Leaderboard</a>
+                <a onclick="showPage('premium')">💎 Premium</a>
+                <a onclick="showPage('events')">🎪 Events</a>
+                <a onclick="showPage('carbon')">🌱 Carbon</a>
+                <a id="authLink" onclick="handleAuth()">🔐 Login</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="alertContainer"></div>
+    <div class="container" id="app"></div>
+
+    <script>
+        // Create 20 Parking Slots (A through T)
+        const locations = ["Downtown", "Mall Area", "Airport", "Stadium", "Business Park", "Hospital", "University", "Convention Center"];
+        const slotNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+        
+        let parkingSlots = [];
+        
+        // Generate 20 parking slots
+        for (let i = 0; i < 20; i++) {
+            const locationIndex = i % locations.length;
+            const basePrice = [5, 4, 8, 6, 7, 5, 4, 6][locationIndex % 8];
+            parkingSlots.push({
+                id: i + 1,
+                name: slotNames[i],
+                location: locations[locationIndex],
+                price: basePrice,
+                distance: (Math.random() * 2 + 0.1).toFixed(1),
+                status: "available",
+                evCharging: Math.random() > 0.5,
+                covered: Math.random() > 0.4,
+                security: Math.random() > 0.3,
+                rating: (Math.random() * 1.5 + 3.5).toFixed(1),
+                bookingsCount: Math.floor(Math.random() * 100),
+                camera: Math.random() > 0.5,
+                vip: i < 5,
+                handicap: i % 5 === 0,
+                premium: i % 3 === 0
+            });
+        }
+
+        // Users data
+        let users = [
+            { id: 1, username: "harini", password: "harini123", email: "harini@example.com", name: "Harini", points: 250, badges: ["early_bird"], bookingsCount: 3, referralCode: "HARINI123", referredBy: null, subscription: "free" },
+            { id: 2, username: "demo", password: "demo123", email: "demo@example.com", name: "Demo User", points: 100, badges: [], bookingsCount: 0, referralCode: "DEMO123", referredBy: null, subscription: "free" },
+            { id: 3, username: "john", password: "john123", email: "john@example.com", name: "John Doe", points: 350, badges: ["frequent_parker"], bookingsCount: 12, referralCode: "JOHN456", referredBy: null, subscription: "premium" }
+        ];
+
+        let bookings = [];
+        let referrals = [];
+        let carbonFootprints = [];
+        
+        let events = [
+            { id: 1, name: "Summer Parking Festival", date: "2024-07-15", location: "Downtown", discount: 30, spots: 50, description: "Enjoy 30% off on all parking slots!" },
+            { id: 2, name: "EV Day Special", date: "2024-07-20", location: "Mall Area", discount: 50, spots: 30, description: "Special discount for EV owners!" },
+            { id: 3, name: "Weekend Special", date: "2024-07-27", location: "Airport", discount: 25, spots: 100, description: "Weekend parking at special rates!" },
+            { id: 4, name: "VIP Members Exclusive", date: "2024-08-01", location: "Business Park", discount: 40, spots: 20, description: "Exclusive 40% off for VIP members!" }
+        ];
+
+        let currentUser = null;
+        let currentPage = "dashboard";
+        let userPoints = 0;
+        let userBadges = [];
+
+        const badgesCollection = {
+            early_bird: { name: "Early Bird", icon: "🌅", description: "Book before 8 AM", points: 50 },
+            night_owl: { name: "Night Owl", icon: "🦉", description: "Book after 10 PM", points: 50 },
+            frequent_parker: { name: "Frequent Parker", icon: "🏆", description: "Complete 10+ bookings", points: 100 },
+            vip_member: { name: "VIP Member", icon: "👑", description: "Complete 50+ bookings", points: 500 },
+            eco_friendly: { name: "Eco Friendly", icon: "🌱", description: "Use EV charging", points: 75 },
+            referral_king: { name: "Referral King", icon: "👑", description: "Refer 5+ friends", points: 200 },
+            parking_master: { name: "Parking Master", icon: "🎯", description: "Book all 20 slots", points: 1000 },
+            premium_user: { name: "Premium User", icon: "💎", description: "Subscribe to Premium", points: 150 }
+        };
+
+        // Helper Functions
+        function showAlert(message, type = "success") {
+            const alertDiv = document.createElement("div");
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            document.getElementById("alertContainer").appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        }
+
+        function loadTheme() {
+            if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark-mode");
+        }
+
+        function predictDynamicPrice(slot) {
+            const basePrice = slot.price;
+            const demandFactor = slot.bookingsCount / 100;
+            const timeFactor = new Date().getHours() >= 8 && new Date().getHours() <= 18 ? 1.5 : 1;
+            const vipMultiplier = slot.vip ? 1.2 : 1;
+            const premiumMultiplier = slot.premium ? 1.3 : 1;
+            return Math.round(basePrice * (1 + demandFactor) * timeFactor * vipMultiplier * premiumMultiplier * 100) / 100;
+        }
+
+        function addPoints(points, reason) {
+            if (!currentUser) return;
+            userPoints += points;
+            showAlert(`+${points} points! ${reason}`, "success");
+            const user = users.find(u => u.id === currentUser.id);
+            if (user) user.points = userPoints;
+        }
+
+        function checkAndAwardBadges() {
+            if (!currentUser) return;
+            const userBookingCount = bookings.filter(b => b.userId === currentUser.id && b.status === "confirmed").length;
+            const referralCount = referrals.filter(r => r.referrerId === currentUser.id).length;
+            const uniqueSlots = new Set(bookings.filter(b => b.userId === currentUser.id).map(b => b.slotId)).size;
+            
+            if (userBookingCount >= 10 && !userBadges.includes("frequent_parker")) {
+                userBadges.push("frequent_parker");
+                addPoints(100, "Achievement: Frequent Parker! 🏆");
+            }
+            if (userBookingCount >= 50 && !userBadges.includes("vip_member")) {
+                userBadges.push("vip_member");
+                addPoints(500, "Achievement: VIP Member! 👑");
+            }
+            if (referralCount >= 5 && !userBadges.includes("referral_king")) {
+                userBadges.push("referral_king");
+                addPoints(200, "Achievement: Referral King! 👑");
+            }
+            if (uniqueSlots >= 20 && !userBadges.includes("parking_master")) {
+                userBadges.push("parking_master");
+                addPoints(1000, "Achievement: Parking Master! 🎯 You've booked all slots!");
+            }
+            if (currentUser.subscription === "premium" && !userBadges.includes("premium_user")) {
+                userBadges.push("premium_user");
+                addPoints(150, "Achievement: Premium User! 💎");
+            }
+            
+            const user = users.find(u => u.id === currentUser.id);
+            if (user) user.badges = userBadges;
+        }
+
+        // Authentication Functions
+        function handleAuth() {
+            if (currentUser) logout();
+            else showLoginModal();
+        }
+
+        function showLoginModal() {
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🔐 Login to SmartPark</h2>
+                    <div class="demo-credentials">
+                        <strong>📝 Demo Credentials:</strong><br>
+                        👤 harini / harini123<br>
+                        👤 demo / demo123<br>
+                        👤 john / john123
+                    </div>
+                    <div class="form-group"><label>Username</label><input type="text" id="loginUsername"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="loginPassword"></div>
+                    <button class="btn btn-primary" onclick="login()">Login</button>
+                    <button class="btn" onclick="showRegisterModal()">Register</button>
+                    <button class="btn" onclick="closeModal(this)">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showRegisterModal() {
+            closeModal(document.querySelector(".modal"));
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>📝 Register</h2>
+                    <div class="form-group"><label>Name</label><input type="text" id="regName"></div>
+                    <div class="form-group"><label>Username</label><input type="text" id="regUsername"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="regEmail"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="regPassword"></div>
+                    <div class="form-group"><label>Referral Code (Optional)</label><input type="text" id="regReferral" placeholder="Enter referral code if you have one"></div>
+                    <button class="btn btn-primary" onclick="register()">Register</button>
+                    <button class="btn" onclick="closeModal(this)">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function login() {
+            const username = document.getElementById("loginUsername").value;
+            const password = document.getElementById("loginPassword").value;
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                userPoints = user.points;
+                userBadges = [...user.badges];
+                closeModal(document.querySelector(".modal"));
+                showAlert(`Welcome back, ${user.name}! 🚗`, "success");
+                document.getElementById("authLink").innerHTML = "🔓 Logout";
+                showPage(currentPage);
+            } else {
+                showAlert("Invalid credentials! Try: harini / harini123", "error");
+            }
+        }
+
+        function register() {
+            const name = document.getElementById("regName").value;
+            const username = document.getElementById("regUsername").value;
+            const email = document.getElementById("regEmail").value;
+            const password = document.getElementById("regPassword").value;
+            const referralCode = document.getElementById("regReferral").value;
+            
+            if (!name || !username || !email || !password) {
+                showAlert("Please fill all fields!", "error");
+                return;
+            }
+            
+            if (users.find(u => u.username === username)) {
+                showAlert("Username exists!", "error");
+                return;
+            }
+            
+            let referredBy = null;
+            if (referralCode) {
+                const referrer = users.find(u => u.referralCode === referralCode);
+                if (referrer) {
+                    referredBy = referrer.id;
+                    referrals.push({ id: referrals.length + 1, referrerId: referrer.id, newUserId: users.length + 1, date: new Date() });
+                    const referrerUser = users.find(u => u.id === referrer.id);
+                    if (referrerUser) {
+                        referrerUser.points += 50;
+                        showAlert(`Referrer ${referrerUser.name} earned 50 points!`, "success");
+                    }
+                }
+            }
+            
+            const newUser = {
+                id: users.length + 1, username, password, email, name, points: 100, badges: [], bookingsCount: 0,
+                referralCode: username.toUpperCase() + Math.floor(Math.random() * 1000), referredBy, subscription: "free"
+            };
+            users.push(newUser);
+            currentUser = newUser;
+            userPoints = 100;
+            userBadges = [];
+            closeModal(document.querySelector(".modal"));
+            showAlert("Registration successful! +100 points! 🎉", "success");
+            document.getElementById("authLink").innerHTML = "🔓 Logout";
+            showPage(currentPage);
+        }
+
+        function logout() {
+            if (currentUser) {
+                const user = users.find(u => u.id === currentUser.id);
+                if (user) { user.points = userPoints; user.badges = userBadges; }
+            }
+            currentUser = null;
+            showAlert("Logged out!", "success");
+            document.getElementById("authLink").innerHTML = "🔐 Login";
+            showPage(currentPage);
+        }
+
+        function closeModal(element) {
+            const modal = element.closest(".modal");
+            if (modal) modal.remove();
+        }
+
+        // Booking Functions
+        function bookSlot(slotId) {
+            if (!currentUser) { showAlert("Please login first!", "error"); showLoginModal(); return; }
+            const slot = parkingSlots.find(s => s.id === slotId);
+            if (slot.status !== "available") { showAlert("Slot not available!", "error"); return; }
+            
+            const dynamicPrice = predictDynamicPrice(slot);
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Book Slot ${slot.name}</h2>
+                    <div class="ai-insight">
+                        💰 Price: $${dynamicPrice}/hour<br>
+                        ⭐ Rating: ${slot.rating}★<br>
+                        ${slot.vip ? '👑 VIP Slot' : ''} ${slot.premium ? '💎 Premium Slot' : ''} ${slot.handicap ? '♿ Handicap Accessible' : ''}
+                    </div>
+                    <div class="form-group"><label>Vehicle Number</label><input type="text" id="vehicleNumber"></div>
+                    <div class="form-group"><label>Duration (hours)</label><select id="duration"><option value="1">1 hour - $${dynamicPrice}</option><option value="2">2 hours - $${dynamicPrice * 2}</option><option value="3">3 hours - $${dynamicPrice * 3}</option><option value="4">4 hours - $${dynamicPrice * 4}</option></select></div>
+                    <button class="btn btn-primary" onclick="confirmBooking(${slot.id}, ${dynamicPrice})">Confirm</button>
+                    <button class="btn" onclick="closeModal(this)">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function confirmBooking(slotId, dynamicPrice) {
+            const slot = parkingSlots.find(s => s.id === slotId);
+            const vehicleNumber = document.getElementById("vehicleNumber").value;
+            const duration = parseInt(document.getElementById("duration").value);
+            if (!vehicleNumber) { showAlert("Enter vehicle number!", "error"); return; }
+            
+            let totalAmount = dynamicPrice * duration;
+            if (currentUser.subscription === "premium") {
+                totalAmount = totalAmount * 0.9; // 10% discount for premium
+                showAlert("Premium discount applied! 10% off!", "success");
+            }
+            
+            const booking = {
+                id: bookings.length + 1, slotId, slotName: slot.name, location: slot.location, userId: currentUser.id,
+                userName: currentUser.name, vehicleNumber, duration, totalAmount, bookingTime: new Date(), status: "confirmed",
+                qrCode: `PARK-${slot.name}-${Date.now()}`
+            };
+            bookings.push(booking);
+            slot.status = "booked";
+            slot.bookingsCount++;
+            
+            let pointsEarned = Math.floor(totalAmount * 10);
+            if (currentUser.subscription === "premium") {
+                pointsEarned = pointsEarned * 2; // Double points for premium
+                showAlert("Premium bonus! Double points earned!", "success");
+            }
+            addPoints(pointsEarned, `Earned ${pointsEarned} points!`);
+            
+            const hour = new Date().getHours();
+            if (hour < 8 && !userBadges.includes("early_bird")) { userBadges.push("early_bird"); addPoints(50, "Early Bird! 🌅"); }
+            if (hour >= 22 && !userBadges.includes("night_owl")) { userBadges.push("night_owl"); addPoints(50, "Night Owl! 🦉"); }
+            if (slot.evCharging && !userBadges.includes("eco_friendly")) { userBadges.push("eco_friendly"); addPoints(75, "Eco Friendly! 🌱"); }
+            
+            carbonFootprints.push({ userId: currentUser.id, slotId, date: new Date(), carbonSaved: slot.evCharging ? 5 : 2 });
+            
+            checkAndAwardBadges();
+            closeModal(document.querySelector(".modal"));
+            showAlert(`Booking confirmed! Total: $${totalAmount.toFixed(2)}. +${pointsEarned} points!`, "success");
+            showPage(currentPage);
+        }
+
+        function cancelBooking(bookingId) {
+            if (!confirm("Cancel booking?")) return;
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking && booking.status === "confirmed") {
+                booking.status = "cancelled";
+                const slot = parkingSlots.find(s => s.id === booking.slotId);
+                if (slot) { slot.status = "available"; }
+                showAlert("Booking cancelled!", "success");
+                showPage(currentPage);
+            }
+        }
+
+        function downloadReceipt(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            const receipt = `SMARTPARK PRO RECEIPT\nBooking: ${booking.id}\nSlot: ${booking.slotName}\nTotal: $${booking.totalAmount}\nThank you!`;
+            const blob = new Blob([receipt], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `receipt_${booking.id}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showAlert("Receipt downloaded!", "success");
+        }
+
+        function showQRCode(qrData) {
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `<div class="modal-content"><h2>QR Code</h2><div class="qr-code" id="qrcode"></div><button class="btn" onclick="closeModal(this)">Close</button></div>`;
+            document.body.appendChild(modal);
+            setTimeout(() => new QRCode(document.getElementById("qrcode"), { text: qrData, width: 200, height: 200 }), 100);
+        }
+
+        // All Pages Functions
+        function showReferralsPage() {
+            if (!currentUser) {
+                return `<div class="form-container"><h2>🎁 Referrals</h2><p>Please login to refer friends and earn points!</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            }
+            const referralCount = referrals.filter(r => r.referrerId === currentUser.id).length;
+            return `
+                <h1 class="page-title">🎁 Refer & Earn Program</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${referralCount}</div><div>Friends Referred</div></div>
+                    <div class="stat-card"><div class="stat-value">${referralCount * 50}</div><div>Points Earned</div></div>
+                </div>
+                <div class="form-container">
+                    <h3>Your Unique Referral Code</h3>
+                    <div class="referral-code-box" onclick="copyReferralCode()">${currentUser.referralCode} 📋</div>
+                    <p style="text-align: center; margin-top: 0.5rem;">Click the code to copy!</p>
+                    <p style="margin-top: 1rem;"><strong>✨ How it works:</strong><br>
+                    • Share your code with friends<br>
+                    • They get <strong>50 bonus points</strong> on registration<br>
+                    • You get <strong>50 points</strong> for each referral<br>
+                    • Get <strong>5 referrals</strong> to earn the Referral King badge! 👑</p>
+                </div>
+                <div class="ai-insight">💡 Tip: Share your code on social media to get more referrals and earn more points!</div>
+            `;
+        }
+
+        function copyReferralCode() {
+            if (currentUser) {
+                navigator.clipboard.writeText(currentUser.referralCode);
+                showAlert(`Referral code "${currentUser.referralCode}" copied to clipboard! 📋`, "success");
+            }
+        }
+
+        function showLeaderboardPage() {
+            const sortedUsers = [...users].sort((a, b) => b.points - a.points).slice(0, 10);
+            return `
+                <h1 class="page-title">📊 Global Leaderboard</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${users.length}</div><div>Total Users</div></div>
+                    <div class="stat-card"><div class="stat-value">${users.reduce((sum, u) => sum + u.points, 0)}</div><div>Total Points</div></div>
+                </div>
+                <div class="parking-card">
+                    <h3>🏆 Top 10 Parkers</h3>
+                    ${sortedUsers.map((user, idx) => `
+                        <div class="leaderboard-item ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : ''}">
+                            <span><strong>#${idx+1}</strong> ${user.name} ${currentUser?.id === user.id ? '⭐ (You)' : ''}</span>
+                            <span>⭐ ${user.points} pts</span>
+                            <span>🏅 ${user.badges.length} badges</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="weather-widget">🏆 Keep parking to climb the leaderboard! Top 3 get special recognition and bonus points!</div>
+            `;
+        }
+
+        function showPremiumPage() {
+            if (!currentUser) {
+                return `<div class="form-container"><h2>💎 Premium Membership</h2><p>Please login to upgrade!</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            }
+            const isPremium = currentUser.subscription === "premium";
+            return `
+                <h1 class="page-title">💎 Premium Membership</h1>
+                <div class="parking-grid">
+                    <div class="parking-card subscription-plan">
+                        <h3>Free Plan</h3>
+                        <p class="stat-value">$0</p>
+                        <p>✓ Basic parking booking</p>
+                        <p>✓ Earn points</p>
+                        <p>✗ Priority support</p>
+                        <p>✗ 10% discount</p>
+                        <p>✗ Double points</p>
+                        ${currentUser.subscription === "free" ? '<button class="btn btn-success" disabled>✓ Current Plan</button>' : '<button class="btn btn-primary" onclick="upgradeToPremium()">Select</button>'}
+                    </div>
+                    <div class="parking-card subscription-plan popular">
+                        <h3>Premium Plan</h3>
+                        <p class="stat-value">$9.99<span style="font-size: 1rem;">/month</span></p>
+                        <p>✓ Priority booking</p>
+                        <p>✓ 2x points earning</p>
+                        <p>✓ Priority support 24/7</p>
+                        <p>✓ 10% discount on all bookings</p>
+                        <p>✓ Exclusive badges</p>
+                        ${isPremium ? '<button class="btn btn-success" disabled>✓ Active</button>' : '<button class="btn btn-primary" onclick="upgradeToPremium()">Upgrade Now</button>'}
+                    </div>
+                </div>
+                <div class="ai-insight">💎 Premium members earn DOUBLE points and get 10% off all bookings! Upgrade today to maximize your savings!</div>
+            `;
+        }
+
+        function upgradeToPremium() {
+            if (!currentUser) { showAlert("Please login first!", "error"); return; }
+            if (currentUser.subscription === "premium") {
+                showAlert("You are already a Premium member!", "info");
+                return;
+            }
+            currentUser.subscription = "premium";
+            const user = users.find(u => u.id === currentUser.id);
+            if (user) user.subscription = "premium";
+            checkAndAwardBadges();
+            showAlert("Successfully upgraded to Premium! 🎉 Enjoy double points and discounts!", "success");
+            showPage(currentPage);
+        }
+
+        function showEventsPage() {
+            return `
+                <h1 class="page-title">🎪 Special Events & Promotions</h1>
+                <div class="parking-grid">
+                    ${events.map(event => `
+                        <div class="parking-card">
+                            <h3>${event.name}</h3>
+                            <p>📅 ${new Date(event.date).toLocaleDateString()}</p>
+                            <p>📍 ${event.location}</p>
+                            <p>🎉 <strong>${event.discount}% OFF</strong></p>
+                            <p>${event.description}</p>
+                            <p>🎟️ ${event.spots} spots available</p>
+                            <button class="btn btn-primary" onclick="registerForEvent(${event.id})">Register Now</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="weather-widget">
+                    <strong>🎯 Don't Miss Out!</strong><br>
+                    Limited time offers! Register now to secure your spot and enjoy exclusive discounts.
+                </div>
+            `;
+        }
+
+        function registerForEvent(eventId) {
+            if (!currentUser) {
+                showAlert("Please login to register for events!", "error");
+                showLoginModal();
+                return;
+            }
+            const event = events.find(e => e.id === eventId);
+            if (event) {
+                showAlert(`Successfully registered for ${event.name}! 🎉 Check your email for details.`, "success");
+                addPoints(25, `Registered for ${event.name}!`);
+            }
+        }
+
+        function showCarbonPage() {
+            if (!currentUser) {
+                return `<div class="form-container"><h2>🌱 Carbon Tracker</h2><p>Please login to track your carbon savings!</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            }
+            const userCarbon = carbonFootprints.filter(c => c.userId === currentUser.id);
+            const totalSaved = userCarbon.reduce((sum, c) => sum + c.carbonSaved, 0);
+            const treesEquivalent = Math.floor(totalSaved * 0.1);
+            const ecoBookings = userCarbon.length;
+            
+            return `
+                <h1 class="page-title">🌱 Carbon Footprint Tracker</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${totalSaved}</div><div>kg CO₂ Saved</div></div>
+                    <div class="stat-card"><div class="stat-value">${treesEquivalent}</div><div>Trees Equivalent</div></div>
+                    <div class="stat-card"><div class="stat-value">${ecoBookings}</div><div>Eco-friendly Bookings</div></div>
+                </div>
+                <div class="ai-insight">
+                    <strong>🌍 Your Environmental Impact</strong><br>
+                    You've saved <strong>${totalSaved} kg</strong> of CO₂ emissions by choosing eco-friendly parking options!<br>
+                    That's equivalent to planting <strong>${treesEquivalent} trees</strong>! 🌳
+                </div>
+                <div class="weather-widget">
+                    <strong>💡 Eco-Friendly Tips</strong><br>
+                    • Choose EV charging spots to reduce emissions by 70%<br>
+                    • Carpool with friends to share parking costs<br>
+                    • Use covered parking to protect your vehicle<br>
+                    • Walk or bike for short distances
+                </div>
+                <div class="parking-card">
+                    <h3>🏆 Your Green Achievements</h3>
+                    ${userBadges.includes("eco_friendly") ? '<p>✓ <strong>Eco Friendly Badge Unlocked!</strong> 🌱</p>' : '<p>🔒 Make 1 eco-friendly booking to unlock Eco Friendly badge!</p>'}
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${Math.min(100, ecoBookings * 20)}%"></div></div>
+                    <p>${ecoBookings}/5 eco-friendly bookings for next milestone</p>
+                </div>
+            `;
+        }
+
+        // Main Pages
+        function showDashboardPage() {
+            const totalSlots = parkingSlots.length;
+            const availableSlots = parkingSlots.filter(s => s.status === "available").length;
+            const bookedSlots = parkingSlots.filter(s => s.status === "booked").length;
+            const totalRevenue = bookings.filter(b => b.status === "confirmed").reduce((sum, b) => sum + b.totalAmount, 0);
+            
+            return `
+                <h1 class="page-title">Smart Dashboard</h1>
+                <div class="weather-widget">🌤️ Clear skies, 72°F - Perfect for parking! | 🚗 ${totalSlots} Total Slots Available</div>
+                <div class="ai-insight">🤖 AI Insights:<br>• Morning rush 8-10 AM! Book early for best spots.<br>• Best value: Downtown area starting at $4/hour<br>• EV charging available at ${parkingSlots.filter(s => s.evCharging).length} locations<br>• VIP slots available for premium members</div>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${totalSlots}</div><div>Total Slots</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color: var(--primary-color)">${availableSlots}</div><div>Available</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color: var(--danger-color)">${bookedSlots}</div><div>Booked</div></div>
+                    <div class="stat-card"><div class="stat-value">$${totalRevenue}</div><div>Revenue</div></div>
+                    ${currentUser ? `<div class="stat-card"><div class="stat-value">${userPoints}</div><div>Your Points</div></div>` : ''}
+                </div>
+                <h3>🔥 Featured Premium Slots</h3>
+                <div class="parking-grid">
+                    ${parkingSlots.filter(s => s.vip || s.premium).slice(0, 4).map(slot => `
+                        <div class="parking-card">
+                            <h3>⭐ Slot ${slot.name} ${slot.vip ? '👑 VIP' : ''} ${slot.premium ? '💎 Premium' : ''}</h3>
+                            <p>📍 ${slot.location}</p>
+                            <p>💰 $${predictDynamicPrice(slot)}/hour</p>
+                            <p>⚡ ${slot.evCharging ? 'EV Charging Available' : 'Standard Parking'}</p>
+                            <div class="slot-status status-${slot.status}">${slot.status.toUpperCase()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showParkingPage() {
+            return `<h1 class="page-title">🅿️ All Parking Slots (A - T) - 20 Premium Slots</h1>
+                <div class="filter-section">
+                    <select id="filterOption" onchange="filterParking()">
+                        <option value="all">All Slots</option>
+                        <option value="available">Available Only</option>
+                        <option value="booked">Booked Only</option>
+                    </select>
+                    <select id="locationFilter" onchange="filterParking()">
+                        <option value="all">All Locations</option>
+                        <option value="Downtown">Downtown</option>
+                        <option value="Mall Area">Mall Area</option>
+                        <option value="Airport">Airport</option>
+                        <option value="Stadium">Stadium</option>
+                        <option value="Business Park">Business Park</option>
+                        <option value="Hospital">Hospital</option>
+                        <option value="University">University</option>
+                        <option value="Convention Center">Convention Center</option>
+                    </select>
+                    <select id="amenitiesFilter" onchange="filterParking()">
+                        <option value="all">All Amenities</option>
+                        <option value="ev">EV Charging</option>
+                        <option value="covered">Covered Parking</option>
+                        <option value="vip">VIP Slots</option>
+                        <option value="handicap">Handicap Accessible</option>
+                    </select>
+                    <select id="priceFilter" onchange="filterParking()">
+                        <option value="all">All Prices</option>
+                        <option value="low">Price: Low to High</option>
+                        <option value="high">Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="parking-grid" id="parkingGrid"></div>`;
+        }
+
+        function filterParking() {
+            let filtered = [...parkingSlots];
+            const filter = document.getElementById("filterOption")?.value;
+            const location = document.getElementById("locationFilter")?.value;
+            const amenities = document.getElementById("amenitiesFilter")?.value;
+            const priceSort = document.getElementById("priceFilter")?.value;
+            
+            if (filter && filter !== "all") filtered = filtered.filter(s => s.status === filter);
+            if (location && location !== "all") filtered = filtered.filter(s => s.location === location);
+            if (amenities && amenities !== "all") {
+                if (amenities === "ev") filtered = filtered.filter(s => s.evCharging);
+                if (amenities === "covered") filtered = filtered.filter(s => s.covered);
+                if (amenities === "vip") filtered = filtered.filter(s => s.vip);
+                if (amenities === "handicap") filtered = filtered.filter(s => s.handicap);
+            }
+            if (priceSort && priceSort !== "all") {
+                if (priceSort === "low") filtered.sort((a, b) => predictDynamicPrice(a) - predictDynamicPrice(b));
+                if (priceSort === "high") filtered.sort((a, b) => predictDynamicPrice(b) - predictDynamicPrice(a));
+            }
+            
+            const grid = document.getElementById("parkingGrid");
+            if (grid) {
+                grid.innerHTML = filtered.map(slot => `
+                    <div class="parking-card">
+                        <h3>Slot ${slot.name} 
+                            ${slot.vip ? '👑' : ''} 
+                            ${slot.premium ? '💎' : ''} 
+                            ${slot.evCharging ? '⚡' : ''} 
+                            ${slot.covered ? '🏠' : ''}
+                            ${slot.handicap ? '♿' : ''}
+                        </h3>
+                        <p>📍 ${slot.location}</p>
+                        <p>💰 $${predictDynamicPrice(slot)}/hour</p>
+                        <p>📏 ${slot.distance} km away</p>
+                        <p>⭐ ${slot.rating}★ (${slot.bookingsCount} bookings)</p>
+                        <p>${slot.camera ? '📹 24/7 Security Camera' : ''}</p>
+                        <div><span class="slot-status status-${slot.status}">${slot.status.toUpperCase()}</span></div>
+                        ${slot.status === "available" ? `<button class="btn btn-primary" onclick="bookSlot(${slot.id})">Book Now</button>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showBookingsPage() {
+            if (!currentUser) return `<h1 class="page-title">My Bookings</h1><p>Please login to view your bookings.</p>`;
+            const userBookings = bookings.filter(b => b.userId === currentUser.id);
+            if (userBookings.length === 0) return `<h1 class="page-title">My Bookings</h1><p>No bookings yet. Start booking one of our 20 premium slots!</p>`;
+            return `<h1 class="page-title">My Bookings (${userBookings.length} total)</h1><div class="parking-grid">${userBookings.map(booking => `
+                <div class="parking-card">
+                    <h3>Slot ${booking.slotName}</h3>
+                    <p>📍 ${booking.location}</p>
+                    <p>🚗 ${booking.vehicleNumber}</p>
+                    <p>⏱️ ${booking.duration} hours</p>
+                    <p>💰 $${booking.totalAmount.toFixed(2)}</p>
+                    <p>Status: <span class="slot-status status-${booking.status}">${booking.status}</span></p>
+                    <p>📅 ${new Date(booking.bookingTime).toLocaleString()}</p>
+                    <div>
+                        <button class="btn btn-info" onclick="downloadReceipt(${booking.id})">Receipt</button>
+                        ${booking.status === "confirmed" ? `<button class="btn btn-danger" onclick="cancelBooking(${booking.id})">Cancel</button>` : ''}
+                        <button class="btn btn-primary" onclick="showQRCode('${booking.qrCode}')">QR Code</button>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function showProfilePage() {
+            if (!currentUser) return `<h1 class="page-title">Profile</h1><p>Please login to view your profile.</p>`;
+            const userBookings = bookings.filter(b => b.userId === currentUser.id);
+            const totalSpent = userBookings.reduce((sum, b) => sum + b.totalAmount, 0);
+            const uniqueSlots = new Set(userBookings.map(b => b.slotId)).size;
+            return `
+                <div class="form-container">
+                    <h2>👤 Profile</h2>
+                    <div class="form-group"><label>Name</label><input type="text" id="profileName" value="${currentUser.name}"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="profileEmail" value="${currentUser.email}"></div>
+                    <div class="form-group"><label>Points</label><input value="${userPoints} points" disabled></div>
+                    <div class="form-group"><label>Badges</label><input value="${userBadges.length} badges" disabled></div>
+                    <div class="form-group"><label>Bookings</label><input value="${userBookings.length} bookings" disabled></div>
+                    <div class="form-group"><label>Unique Slots Booked</label><input value="${uniqueSlots}/20 slots" disabled></div>
+                    <div class="form-group"><label>Total Spent</label><input value="$${totalSpent.toFixed(2)}" disabled></div>
+                    <div class="form-group"><label>Subscription</label><input value="${currentUser.subscription === 'premium' ? 'Premium ⭐' : 'Free'}" disabled></div>
+                    <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+                </div>
+            `;
+        }
+
+        function updateProfile() {
+            const name = document.getElementById("profileName").value;
+            const email = document.getElementById("profileEmail").value;
+            if (currentUser) {
+                currentUser.name = name;
+                currentUser.email = email;
+                const user = users.find(u => u.id === currentUser.id);
+                if (user) { user.name = name; user.email = email; }
+                showAlert("Profile updated!", "success");
+                showPage(currentPage);
+            }
+        }
+
+        function showAchievementsPage() {
+            if (!currentUser) return `<div class="form-container"><h2>Achievements</h2><p>Please login to view achievements.</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            const userBookingCount = bookings.filter(b => b.userId === currentUser.id && b.status === "confirmed").length;
+            return `
+                <h1 class="page-title">🏆 Achievements</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${userPoints}</div><div>Points</div></div>
+                    <div class="stat-card"><div class="stat-value">${userBadges.length}</div><div>Badges</div></div>
+                    <div class="stat-card"><div class="stat-value">${userBookingCount}</div><div>Bookings</div></div>
+                </div>
+                <div class="parking-grid">
+                    ${Object.entries(badgesCollection).map(([key, badge]) => `
+                        <div class="parking-card">
+                            <div class="achievement-icon">${badge.icon}</div>
+                            <h3>${badge.name}</h3>
+                            <p>${badge.description}</p>
+                            <p>🎁 ${badge.points} points</p>
+                            ${userBadges.includes(key) ? '<span class="badge badge-gold">✓ UNLOCKED!</span>' : '<span class="badge badge-locked">🔒 Locked</span>'}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="ai-insight">💡 Keep parking to unlock more badges! Try to book all 20 slots for the Parking Master badge! 🎯</div>
+            `;
+        }
+
+        // Main Navigation
+        function showPage(page) {
+            currentPage = page;
+            const app = document.getElementById("app");
+            
+            switch(page) {
+                case "dashboard": app.innerHTML = showDashboardPage(); break;
+                case "parking": app.innerHTML = showParkingPage(); setTimeout(() => filterParking(), 100); break;
+                case "bookings": app.innerHTML = showBookingsPage(); break;
+                case "profile": app.innerHTML = showProfilePage(); break;
+                case "achievements": app.innerHTML = showAchievementsPage(); break;
+                case "referrals": app.innerHTML = showReferralsPage(); break;
+                case "leaderboard": app.innerHTML = showLeaderboardPage(); break;
+                case "premium": app.innerHTML = showPremiumPage(); break;
+                case "events": app.innerHTML = showEventsPage(); break;
+                case "carbon": app.innerHTML = showCarbonPage(); break;
+                default: app.innerHTML = showDashboardPage();
+            }
+        }
+
+        // Initialize
+        loadTheme();
+        showPage("dashboard");
+    </script>
+</body>
+</html>

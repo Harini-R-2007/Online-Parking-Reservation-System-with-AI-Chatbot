@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Pro - AI Parking Assistant with Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4CAF50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196F3;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            background: var(--dark-bg);
+            color: white;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        body.dark-mode .navbar {
+            background: #16213e;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .parking-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .parking-card {
+            background: #16213e;
+        }
+
+        .parking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .parking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .slot-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .status-booked {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: #333;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+
+        body.dark-mode .form-container {
+            background: #16213e;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #0f3460;
+            border-color: #16213e;
+            color: white;
+        }
+
+        .alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .alert-error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .stat-card {
+            background: #16213e;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .modal-content {
+            background: #16213e;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .payment-method-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        body.dark-mode .payment-method-card {
+            background: #0f3460;
+        }
+
+        .payment-method-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .payment-method-card.selected {
+            border-color: var(--primary-color);
+            background: var(--gradient-success);
+        }
+
+        .payment-method-card .method-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-details {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        body.dark-mode .payment-details {
+            background: #0f3460;
+        }
+
+        .payment-details.active {
+            display: block;
+        }
+
+        .price-breakdown {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .demo-credentials {
+            background: #e8f5e9;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .referral-code-box {
+            background: var(--gradient-primary);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: white;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .leaderboard-item {
+            border-bottom-color: #0f3460;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; border-radius: 10px; margin: 5px 0; padding: 10px; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #333; border-radius: 10px; margin: 5px 0; padding: 10px; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: white; border-radius: 10px; margin: 5px 0; padding: 10px; }
+
+        .subscription-plan {
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .subscription-plan:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .subscription-plan.popular {
+            border-color: var(--warning-color);
+            position: relative;
+        }
+
+        .subscription-plan.popular::before {
+            content: '🔥 POPULAR';
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--warning-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .ai-insight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .weather-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            margin: 0.5rem;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #333;
+        }
+
+        .badge-locked {
+            background: #95a5a6;
+            color: white;
+            opacity: 0.6;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: var(--transition);
+            font-size: 1.5rem;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        body.dark-mode .chatbot-window {
+            background: #16213e;
+        }
+
+        .chatbot-header {
+            background: var(--gradient-primary);
+            padding: 1rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .chatbot-input-area {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-message {
+            background: var(--gradient-primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        body.dark-mode .bot-message {
+            background: #0f3460;
+            color: white;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .quick-reply {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .parking-grid {
+                grid-template-columns: 1fr;
+            }
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🚗 SmartPark Pro | AI Parking Assistant with Chatbot</div>
+            <div class="nav-links">
+                <a onclick="showPage('dashboard')">🏠 Dashboard</a>
+                <a onclick="showPage('parking')">🅿️ Parking (20 Slots)</a>
+                <a onclick="showPage('bookings')">📅 Bookings</a>
+                <a onclick="showPage('profile')">👤 Profile</a>
+                <a onclick="showPage('achievements')">🏆 Achievements</a>
+                <a onclick="showPage('referrals')">🎁 Referrals</a>
+                <a onclick="showPage('leaderboard')">📊 Leaderboard</a>
+                <a onclick="showPage('premium')">💎 Premium</a>
+                <a onclick="showPage('events')">🎪 Events</a>
+                <a onclick="showPage('carbon')">🌱 Carbon</a>
+                <a id="authLink" onclick="handleAuth()">🔐 Login</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="alertContainer"></div>
+
+    <div class="chatbot-container">
+        <div class="chatbot-toggle" onclick="toggleChatbot()">
+            💬
+        </div>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <span>🤖 AI Parking Assistant</span>
+                <span style="cursor: pointer;" onclick="toggleChatbot()">✕</span>
+            </div>
+            <div class="chatbot-messages" id="chatMessages">
+                <div class="message bot-message">Hello! I'm your AI parking assistant. Ask me about available slots, prices, or payment methods! 💳</div>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="handleChatKeypress(event)">
+                <button class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+            </div>
+            <div class="quick-replies">
+                <span class="quick-reply" onclick="sendQuickReply('available slots')">📊 Available</span>
+                <span class="quick-reply" onclick="sendQuickReply('cheapest parking')">💰 Cheapest</span>
+                <span class="quick-reply" onclick="sendQuickReply('payment methods')">💳 Payments</span>
+                <span class="quick-reply" onclick="sendQuickReply('ev charging')">⚡ EV</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="app"></div>
+
+    <script>
+        // Define locations with their base prices
+        const locations = [
+            { name: "Downtown", basePrice: 5, evCount: 3 },
+            { name: "Mall Area", basePrice: 4, evCount: 2 },
+            { name: "Airport", basePrice: 8, evCount: 4 },
+            { name: "Stadium", basePrice: 6, evCount: 1 },
+            { name: "Business Park", basePrice: 7, evCount: 3 },
+            { name: "Hospital", basePrice: 5, evCount: 2 },
+            { name: "University", basePrice: 4, evCount: 1 },
+            { name: "Convention Center", basePrice: 6, evCount: 2 }
+        ];
+        
+        const slotNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+        
+        let parkingSlots = [];
+        
+        // Generate 20 parking slots with proper mix
+        for (let i = 0; i < 20; i++) {
+            const locationIndex = i % locations.length;
+            const location = locations[locationIndex];
+            
+            // Determine slot type (only first 3 are VIP, next 3 are Premium, rest regular)
+            let isVip = false;
+            let isPremium = false;
+            let priceMultiplier = 1;
+            
+            if (i < 3) {
+                isVip = true;
+                priceMultiplier = 1.3;
+            } else if (i >= 3 && i < 6) {
+                isPremium = true;
+                priceMultiplier = 1.15;
+            } else if (i >= 6 && i < 10) {
+                isPremium = false;
+                priceMultiplier = 1;
+            } else {
+                isPremium = false;
+                priceMultiplier = 0.9;
+            }
+            
+            const basePrice = location.basePrice;
+            const finalPrice = Math.round(basePrice * priceMultiplier * 100) / 100;
+            
+            parkingSlots.push({
+                id: i + 1,
+                name: slotNames[i],
+                location: location.name,
+                price: finalPrice,
+                basePrice: basePrice,
+                distance: (Math.random() * 1.5 + 0.2).toFixed(1),
+                status: "available",
+                evCharging: i < location.evCount || Math.random() > 0.7,
+                covered: i % 3 === 0 || Math.random() > 0.6,
+                rating: (Math.random() * 1 + 4).toFixed(1),
+                bookingsCount: Math.floor(Math.random() * 50),
+                vip: isVip,
+                premium: isPremium,
+                handicap: i % 4 === 0
+            });
+        }
+
+        let users = [
+            { id: 1, username: "harini", password: "harini123", email: "harini@example.com", name: "Harini", points: 250, badges: ["early_bird"], bookingsCount: 3, referralCode: "HARINI123", subscription: "free" },
+            { id: 2, username: "demo", password: "demo123", email: "demo@example.com", name: "Demo User", points: 100, badges: [], bookingsCount: 0, referralCode: "DEMO123", subscription: "free" },
+            { id: 3, username: "john", password: "john123", email: "john@example.com", name: "John Doe", points: 350, badges: ["frequent_parker"], bookingsCount: 12, referralCode: "JOHN456", subscription: "premium" }
+        ];
+
+        let bookings = [];
+        let referrals = [];
+        let carbonFootprints = [];
+        let payments = [];
+        
+        let events = [
+            { id: 1, name: "Summer Parking Festival", date: "2024-07-15", location: "Downtown", discount: 30, spots: 50 },
+            { id: 2, name: "EV Day Special", date: "2024-07-20", location: "Mall Area", discount: 50, spots: 30 }
+        ];
+
+        let currentUser = null;
+        let currentPage = "dashboard";
+        let userPoints = 0;
+        let userBadges = [];
+
+        const badgesCollection = {
+            early_bird: { name: "Early Bird", icon: "🌅", description: "Book before 8 AM", points: 50 },
+            frequent_parker: { name: "Frequent Parker", icon: "🏆", description: "10+ bookings", points: 100 },
+            eco_friendly: { name: "Eco Friendly", icon: "🌱", description: "Use EV charging", points: 75 },
+            referral_king: { name: "Referral King", icon: "👑", description: "Refer 5+ friends", points: 200 },
+            parking_master: { name: "Parking Master", icon: "🎯", description: "Book all 20 slots", points: 1000 }
+        };
+
+        function showAlert(message, type = "success") {
+            const alertDiv = document.createElement("div");
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            document.getElementById("alertContainer").appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        }
+
+        function loadTheme() {
+            if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark-mode");
+        }
+
+        function predictDynamicPrice(slot) {
+            let price = slot.price;
+            const hour = new Date().getHours();
+            // Peak hour pricing (8-10 AM, 5-7 PM)
+            if ((hour >= 8 && hour <= 10) || (hour >= 17 && hour <= 19)) {
+                price = price * 1.2;
+            }
+            // Off-peak discount (11 AM - 4 PM)
+            if (hour >= 11 && hour <= 16) {
+                price = price * 0.9;
+            }
+            return Math.round(price * 100) / 100;
+        }
+
+        function addPoints(points, reason) {
+            if (!currentUser) return;
+            userPoints += points;
+            showAlert(`+${points} points! ${reason}`, "success");
+            const user = users.find(u => u.id === currentUser.id);
+            if (user) user.points = userPoints;
+        }
+
+        function checkAndAwardBadges() {
+            if (!currentUser) return;
+            const userBookingCount = bookings.filter(b => b.userId === currentUser.id && b.status === "confirmed").length;
+            const referralCount = referrals.filter(r => r.referrerId === currentUser.id).length;
+            const uniqueSlots = new Set(bookings.filter(b => b.userId === currentUser.id).map(b => b.slotId)).size;
+            
+            if (userBookingCount >= 10 && !userBadges.includes("frequent_parker")) {
+                userBadges.push("frequent_parker");
+                addPoints(100, "Frequent Parker! 🏆");
+            }
+            if (referralCount >= 5 && !userBadges.includes("referral_king")) {
+                userBadges.push("referral_king");
+                addPoints(200, "Referral King! 👑");
+            }
+            if (uniqueSlots >= 20 && !userBadges.includes("parking_master")) {
+                userBadges.push("parking_master");
+                addPoints(1000, "Parking Master! 🎯");
+            }
+            const user = users.find(u => u.id === currentUser.id);
+            if (user) user.badges = userBadges;
+        }
+
+        function handleAuth() {
+            if (currentUser) logout();
+            else showLoginModal();
+        }
+
+        function showLoginModal() {
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🔐 Login to SmartPark</h2>
+                    <div class="demo-credentials">
+                        <strong>📝 Demo Credentials:</strong><br>
+                        👤 harini / harini123<br>
+                        👤 demo / demo123<br>
+                        👤 john / john123
+                    </div>
+                    <div class="form-group"><label>Username</label><input type="text" id="loginUsername"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="loginPassword"></div>
+                    <button class="btn btn-primary" onclick="login()">Login</button>
+                    <button class="btn" onclick="showRegisterModal()">Register</button>
+                    <button class="btn" onclick="closeModal(this)">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showRegisterModal() {
+            closeModal(document.querySelector(".modal"));
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>📝 Register</h2>
+                    <div class="form-group"><label>Name</label><input type="text" id="regName"></div>
+                    <div class="form-group"><label>Username</label><input type="text" id="regUsername"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="regEmail"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="regPassword"></div>
+                    <div class="form-group"><label>Referral Code</label><input type="text" id="regReferral" placeholder="Optional"></div>
+                    <button class="btn btn-primary" onclick="register()">Register</button>
+                    <button class="btn" onclick="closeModal(this)">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function login() {
+            const username = document.getElementById("loginUsername").value;
+            const password = document.getElementById("loginPassword").value;
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                userPoints = user.points;
+                userBadges = [...user.badges];
+                closeModal(document.querySelector(".modal"));
+                showAlert(`Welcome back, ${user.name}! 🚗`, "success");
+                document.getElementById("authLink").innerHTML = "🔓 Logout";
+                showPage(currentPage);
+            } else {
+                showAlert("Invalid credentials! Try: harini / harini123", "error");
+            }
+        }
+
+        function register() {
+            const name = document.getElementById("regName").value;
+            const username = document.getElementById("regUsername").value;
+            const email = document.getElementById("regEmail").value;
+            const password = document.getElementById("regPassword").value;
+            const referralCode = document.getElementById("regReferral").value;
+            
+            if (!name || !username || !email || !password) {
+                showAlert("Please fill all fields!", "error");
+                return;
+            }
+            
+            if (users.find(u => u.username === username)) {
+                showAlert("Username exists!", "error");
+                return;
+            }
+            
+            let referredBy = null;
+            if (referralCode) {
+                const referrer = users.find(u => u.referralCode === referralCode);
+                if (referrer) {
+                    referredBy = referrer.id;
+                    referrals.push({ id: referrals.length + 1, referrerId: referrer.id, newUserId: users.length + 1, date: new Date() });
+                    const referrerUser = users.find(u => u.id === referrer.id);
+                    if (referrerUser) {
+                        referrerUser.points += 50;
+                        showAlert(`Referrer ${referrerUser.name} earned 50 points!`, "success");
+                    }
+                }
+            }
+            
+            const newUser = {
+                id: users.length + 1, username, password, email, name, points: 100, badges: [], bookingsCount: 0,
+                referralCode: username.toUpperCase() + Math.floor(Math.random() * 1000), referredBy, subscription: "free"
+            };
+            users.push(newUser);
+            currentUser = newUser;
+            userPoints = 100;
+            userBadges = [];
+            closeModal(document.querySelector(".modal"));
+            showAlert("Registration successful! +100 points! 🎉", "success");
+            document.getElementById("authLink").innerHTML = "🔓 Logout";
+            showPage(currentPage);
+        }
+
+        function logout() {
+            if (currentUser) {
+                const user = users.find(u => u.id === currentUser.id);
+                if (user) { user.points = userPoints; user.badges = userBadges; }
+            }
+            currentUser = null;
+            showAlert("Logged out!", "success");
+            document.getElementById("authLink").innerHTML = "🔐 Login";
+            showPage(currentPage);
+        }
+
+        function closeModal(element) {
+            const modal = element.closest(".modal");
+            if (modal) modal.remove();
+        }
+
+        // Booking with Payment
+        let selectedPaymentMethod = null;
+
+        function bookSlot(slotId) {
+            if (!currentUser) { showAlert("Please login first!", "error"); showLoginModal(); return; }
+            const slot = parkingSlots.find(s => s.id === slotId);
+            if (slot.status !== "available") { showAlert("Slot not available!", "error"); return; }
+            
+            const dynamicPrice = predictDynamicPrice(slot);
+            showPaymentModal(slot, dynamicPrice);
+        }
+
+        function showPaymentModal(slot, dynamicPrice) {
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>📝 Book Slot ${slot.name}</h2>
+                    <div class="price-breakdown">
+                        <strong>💰 Price Breakdown:</strong><br>
+                        Base Price: $${slot.price}/hour<br>
+                        ${slot.vip ? '👑 VIP Surcharge: +30%<br>' : ''}
+                        ${slot.premium ? '💎 Premium Surcharge: +15%<br>' : ''}
+                        <strong>Final Price: $${dynamicPrice}/hour</strong>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🚗 Vehicle Number</label>
+                        <input type="text" id="vehicleNumber" placeholder="e.g., KA01AB1234">
+                    </div>
+                    <div class="form-group">
+                        <label>⏱️ Duration (hours)</label>
+                        <select id="duration">
+                            <option value="1">1 hour - $${dynamicPrice}</option>
+                            <option value="2">2 hours - $${dynamicPrice * 2}</option>
+                            <option value="3">3 hours - $${dynamicPrice * 3}</option>
+                            <option value="4">4 hours - $${dynamicPrice * 4}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>💳 Select Payment Method</label>
+                        <div class="payment-methods">
+                            <div class="payment-method-card" onclick="selectPaymentMethod('card')">
+                                <div class="method-icon">💳</div>
+                                <div class="method-name">Credit/Debit Card</div>
+                            </div>
+                            <div class="payment-method-card" onclick="selectPaymentMethod('upi')">
+                                <div class="method-icon">📱</div>
+                                <div class="method-name">UPI</div>
+                            </div>
+                            <div class="payment-method-card" onclick="selectPaymentMethod('netbanking')">
+                                <div class="method-icon">🏦</div>
+                                <div class="method-name">Net Banking</div>
+                            </div>
+                            <div class="payment-method-card" onclick="selectPaymentMethod('points')">
+                                <div class="method-icon">⭐</div>
+                                <div class="method-name">Loyalty Points (${userPoints} pts)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="cardDetails" class="payment-details">
+                        <h4>💳 Card Details</h4>
+                        <div class="form-group"><label>Card Number</label><input type="text" id="cardNumber" placeholder="1234 5678 9012 3456"></div>
+                        <div class="form-group"><label>Expiry Date</label><input type="text" id="cardExpiry" placeholder="MM/YY"></div>
+                        <div class="form-group"><label>CVV</label><input type="password" id="cardCvv" placeholder="123"></div>
+                    </div>
+                    
+                    <div id="upiDetails" class="payment-details">
+                        <h4>📱 UPI Payment</h4>
+                        <div class="form-group"><label>UPI ID</label><input type="text" id="upiId" placeholder="username@okhdfcbank"></div>
+                    </div>
+                    
+                    <div id="netbankingDetails" class="payment-details">
+                        <h4>🏦 Net Banking</h4>
+                        <div class="form-group"><label>Bank Name</label><select id="bankName"><option>HDFC Bank</option><option>SBI</option><option>ICICI Bank</option></select></div>
+                    </div>
+                    
+                    <div id="pointsDetails" class="payment-details">
+                        <h4>⭐ Loyalty Points Payment</h4>
+                        <p>Available Points: <strong>${userPoints}</strong></p>
+                        <p>1 point = $0.01 discount</p>
+                        <div class="form-group"><label>Points to Use</label><input type="number" id="pointsToUse" min="0" max="${userPoints}" value="0"></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="processPayment(${slot.id}, ${dynamicPrice})">Pay & Confirm</button>
+                    <button class="btn" onclick="closeModal(this)">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-method-card').forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.querySelectorAll('.payment-details').forEach(detail => detail.classList.remove('active'));
+            const detailId = method + 'Details';
+            const detailElement = document.getElementById(detailId);
+            if (detailElement) detailElement.classList.add('active');
+        }
+
+        function processPayment(slotId, dynamicPrice) {
+            const slot = parkingSlots.find(s => s.id === slotId);
+            const vehicleNumber = document.getElementById("vehicleNumber").value;
+            const duration = parseInt(document.getElementById("duration").value);
+            
+            if (!vehicleNumber) { showAlert("Please enter vehicle number!", "error"); return; }
+            if (!selectedPaymentMethod) { showAlert("Please select payment method!", "error"); return; }
+            
+            let totalAmount = dynamicPrice * duration;
+            let pointsUsed = 0;
+            let transactionId = "TXN" + Math.floor(Math.random() * 1000000000);
+            
+            if (selectedPaymentMethod === 'points') {
+                const pointsToUse = parseInt(document.getElementById("pointsToUse").value) || 0;
+                if (pointsToUse > userPoints) { showAlert("Insufficient points!", "error"); return; }
+                const discount = pointsToUse * 0.01;
+                totalAmount = Math.max(0, totalAmount - discount);
+                pointsUsed = pointsToUse;
+            }
+            
+            if (currentUser.subscription === "premium") {
+                totalAmount = totalAmount * 0.9;
+                showAlert("Premium discount applied! 10% off!", "success");
+            }
+            
+            const booking = {
+                id: bookings.length + 1, slotId, slotName: slot.name, location: slot.location, userId: currentUser.id,
+                userName: currentUser.name, vehicleNumber, duration, totalAmount, bookingTime: new Date(), status: "confirmed",
+                qrCode: `PARK-${slot.name}-${Date.now()}`,
+                paymentMethod: selectedPaymentMethod, transactionId, pointsUsed
+            };
+            
+            bookings.push(booking);
+            slot.status = "booked";
+            slot.bookingsCount++;
+            
+            if (pointsUsed > 0) {
+                userPoints -= pointsUsed;
+                showAlert(`Used ${pointsUsed} points!`, "info");
+            }
+            
+            let pointsEarned = Math.floor(totalAmount * 10);
+            if (currentUser.subscription === "premium") pointsEarned = pointsEarned * 2;
+            addPoints(pointsEarned, `Earned ${pointsEarned} points!`);
+            
+            const hour = new Date().getHours();
+            if (hour < 8 && !userBadges.includes("early_bird")) {
+                userBadges.push("early_bird");
+                addPoints(50, "Early Bird! 🌅");
+            }
+            if (slot.evCharging && !userBadges.includes("eco_friendly")) {
+                userBadges.push("eco_friendly");
+                addPoints(75, "Eco Friendly! 🌱");
+            }
+            
+            carbonFootprints.push({ userId: currentUser.id, slotId, carbonSaved: slot.evCharging ? 5 : 2 });
+            checkAndAwardBadges();
+            
+            closeModal(document.querySelector(".modal"));
+            showAlert(`Booking confirmed! Total: $${totalAmount.toFixed(2)}. +${pointsEarned} points!`, "success");
+            showPage(currentPage);
+        }
+
+        function cancelBooking(bookingId) {
+            if (!confirm("Cancel booking?")) return;
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking && booking.status === "confirmed") {
+                booking.status = "cancelled";
+                const slot = parkingSlots.find(s => s.id === booking.slotId);
+                if (slot) { slot.status = "available"; }
+                showAlert("Booking cancelled!", "success");
+                showPage(currentPage);
+            }
+        }
+
+        function downloadReceipt(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            const receipt = `SMARTPARK PRO RECEIPT\nBooking: ${booking.id}\nSlot: ${booking.slotName}\nVehicle: ${booking.vehicleNumber}\nTotal: $${booking.totalAmount.toFixed(2)}\nPayment: ${booking.paymentMethod}\nTransaction: ${booking.transactionId}\nThank you!`;
+            const blob = new Blob([receipt], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `receipt_${booking.id}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showAlert("Receipt downloaded!", "success");
+        }
+
+        function showQRCode(qrData) {
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.style.display = "flex";
+            modal.innerHTML = `<div class="modal-content"><h2>Entry QR Code</h2><div class="qr-code" id="qrcode"></div><button class="btn" onclick="closeModal(this)">Close</button></div>`;
+            document.body.appendChild(modal);
+            setTimeout(() => new QRCode(document.getElementById("qrcode"), { text: qrData, width: 200, height: 200 }), 100);
+        }
+
+        // Chatbot Functions
+        function toggleChatbot() {
+            const chatbot = document.getElementById("chatbotWindow");
+            chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === "Enter") sendChatMessage();
+        }
+
+        function sendQuickReply(message) {
+            document.getElementById("chatInput").value = message;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById("chatInput");
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addChatMessage(message, true);
+            input.value = "";
+            
+            setTimeout(() => {
+                let response = getAIResponse(message);
+                addChatMessage(response, false);
+            }, 500);
+        }
+
+        function addChatMessage(text, isUser) {
+            const messagesDiv = document.getElementById("chatMessages");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function getAIResponse(message) {
+            const msg = message.toLowerCase();
+            if (msg.includes("available") || msg.includes("slot")) {
+                const available = parkingSlots.filter(s => s.status === "available").length;
+                return `Currently ${available} out of 20 slots are available. Would you like to book one?`;
+            } else if (msg.includes("cheapest")) {
+                const cheapest = parkingSlots.filter(s => s.status === "available").sort((a, b) => a.price - b.price)[0];
+                return cheapest ? `The cheapest slot is ${cheapest.name} at $${cheapest.price}/hour in ${cheapest.location}.` : "No slots available.";
+            } else if (msg.includes("payment")) {
+                return `We accept multiple payment methods: 💳 Cards, 📱 UPI, 🏦 Net Banking, and ⭐ Loyalty Points!`;
+            } else if (msg.includes("ev")) {
+                const evSlots = parkingSlots.filter(s => s.evCharging && s.status === "available");
+                return evSlots.length > 0 ? `${evSlots.length} EV charging slots available!` : "No EV slots available currently.";
+            }
+            return "I can help with parking availability, prices, and payments! Ask about available slots, cheapest parking, or payment methods.";
+        }
+
+        // Page Functions
+        function showDashboardPage() {
+            const totalSlots = parkingSlots.length;
+            const availableSlots = parkingSlots.filter(s => s.status === "available").length;
+            const evSlots = parkingSlots.filter(s => s.evCharging).length;
+            const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
+            const vipSlots = parkingSlots.filter(s => s.vip).slice(0, 4);
+            
+            return `
+                <h1 class="page-title">Smart Dashboard</h1>
+                <div class="weather-widget">🌤️ Clear skies, 72°F - Perfect for parking! 🚗 ${totalSlots} Total Slots Available</div>
+                <div class="ai-insight">
+                    🤖 AI Insights:<br>
+                    • Morning rush 8-10 AM! Book early for best spots.<br>
+                    • Best value: Downtown area starting at $4/hour<br>
+                    • EV charging available at ${evSlots} locations
+                </div>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${totalSlots}</div><div>Total Slots</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color: var(--primary-color)">${availableSlots}</div><div>Available</div></div>
+                    <div class="stat-card"><div class="stat-value">$${totalRevenue}</div><div>Revenue</div></div>
+                    ${currentUser ? `<div class="stat-card"><div class="stat-value">${userPoints}</div><div>Your Points</div></div>` : ''}
+                </div>
+                <h3>⭐ Featured Premium Slots</h3>
+                <div class="parking-grid">
+                    ${vipSlots.map(slot => `
+                        <div class="parking-card">
+                            <h3>Slot ${slot.name} ${slot.vip ? '👑 VIP' : ''} ${slot.premium ? '💎 Premium' : ''}</h3>
+                            <p>📍 ${slot.location}</p>
+                            <p>💰 $${predictDynamicPrice(slot)}/hour</p>
+                            <p>⚡ ${slot.evCharging ? 'EV Charging Available' : ''}</p>
+                            <div class="slot-status status-${slot.status}">${slot.status.toUpperCase()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showParkingPage() {
+            return `<h1 class="page-title">🅿️ All Parking Slots (A-T) - 20 Premium Slots</h1>
+                <div class="filter-section">
+                    <select id="filterOption" onchange="filterParking()"><option value="all">All</option><option value="available">Available</option><option value="booked">Booked</option></select>
+                    <select id="locationFilter" onchange="filterParking()"><option value="all">All Locations</option>${locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('')}</select>
+                    <select id="typeFilter" onchange="filterParking()"><option value="all">All Types</option><option value="vip">VIP</option><option value="premium">Premium</option><option value="ev">EV Charging</option></select>
+                </div>
+                <div class="parking-grid" id="parkingGrid"></div>`;
+        }
+
+        function filterParking() {
+            let filtered = [...parkingSlots];
+            const filter = document.getElementById("filterOption")?.value;
+            const location = document.getElementById("locationFilter")?.value;
+            const type = document.getElementById("typeFilter")?.value;
+            
+            if (filter && filter !== "all") filtered = filtered.filter(s => s.status === filter);
+            if (location && location !== "all") filtered = filtered.filter(s => s.location === location);
+            if (type && type !== "all") {
+                if (type === "vip") filtered = filtered.filter(s => s.vip);
+                if (type === "premium") filtered = filtered.filter(s => s.premium);
+                if (type === "ev") filtered = filtered.filter(s => s.evCharging);
+            }
+            
+            const grid = document.getElementById("parkingGrid");
+            if (grid) {
+                grid.innerHTML = filtered.map(slot => `
+                    <div class="parking-card">
+                        <h3>Slot ${slot.name} ${slot.vip ? '👑' : ''} ${slot.premium ? '💎' : ''} ${slot.evCharging ? '⚡' : ''}</h3>
+                        <p>📍 ${slot.location}</p>
+                        <p>💰 $${predictDynamicPrice(slot)}/hour</p>
+                        <p>⭐ ${slot.rating}★ (${slot.bookingsCount} bookings)</p>
+                        <div><span class="slot-status status-${slot.status}">${slot.status.toUpperCase()}</span></div>
+                        ${slot.status === "available" ? `<button class="btn btn-primary" onclick="bookSlot(${slot.id})">Book Now</button>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showBookingsPage() {
+            if (!currentUser) return `<h1>My Bookings</h1><p>Please login.</p>`;
+            const userBookings = bookings.filter(b => b.userId === currentUser.id);
+            if (userBookings.length === 0) return `<h1>My Bookings</h1><p>No bookings yet.</p>`;
+            return `<h1>My Bookings</h1><div class="parking-grid">${userBookings.map(booking => `
+                <div class="parking-card">
+                    <h3>Slot ${booking.slotName}</h3>
+                    <p>🚗 ${booking.vehicleNumber}</p>
+                    <p>💰 $${booking.totalAmount.toFixed(2)}</p>
+                    <p>💳 ${booking.paymentMethod}</p>
+                    <p>Status: <span class="slot-status status-${booking.status}">${booking.status}</span></p>
+                    <div>
+                        <button class="btn btn-info" onclick="downloadReceipt(${booking.id})">Receipt</button>
+                        ${booking.status === "confirmed" ? `<button class="btn btn-danger" onclick="cancelBooking(${booking.id})">Cancel</button>` : ''}
+                        <button class="btn btn-primary" onclick="showQRCode('${booking.qrCode}')">QR</button>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function showProfilePage() {
+            if (!currentUser) return `<h1>Profile</h1><p>Please login.</p>`;
+            return `
+                <div class="form-container">
+                    <h2>👤 Profile</h2>
+                    <div class="form-group"><label>Name</label><input type="text" id="profileName" value="${currentUser.name}"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="profileEmail" value="${currentUser.email}"></div>
+                    <div class="form-group"><label>Points</label><input value="${userPoints} points" disabled></div>
+                    <div class="form-group"><label>Badges</label><input value="${userBadges.length} badges" disabled></div>
+                    <button class="btn btn-primary" onclick="updateProfile()">Update</button>
+                </div>
+            `;
+        }
+
+        function updateProfile() {
+            const name = document.getElementById("profileName").value;
+            const email = document.getElementById("profileEmail").value;
+            if (currentUser) {
+                currentUser.name = name;
+                currentUser.email = email;
+                showAlert("Profile updated!", "success");
+                showPage(currentPage);
+            }
+        }
+
+        function showAchievementsPage() {
+            if (!currentUser) return `<div class="form-container"><h2>Achievements</h2><p>Please login.</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            return `<h1>Achievements</h1><div class="parking-grid">${Object.entries(badgesCollection).map(([key, badge]) => `
+                <div class="parking-card"><div class="achievement-icon">${badge.icon}</div><h3>${badge.name}</h3><p>${badge.description}</p>${userBadges.includes(key) ? '<span class="badge badge-gold">✓ UNLOCKED!</span>' : '<span class="badge badge-locked">🔒 Locked</span>'}</div>
+            `).join('')}</div>`;
+        }
+
+        function showReferralsPage() {
+            if (!currentUser) return `<div class="form-container"><h2>Referrals</h2><p>Please login.</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            const referralCount = referrals.filter(r => r.referrerId === currentUser.id).length;
+            return `<h1>Referrals</h1><div class="stat-card"><div class="stat-value">${referralCount}</div><div>Referred</div></div>
+                <div class="form-container"><h3>Your Code</h3><div class="referral-code-box" onclick="navigator.clipboard.writeText('${currentUser.referralCode}')">${currentUser.referralCode} 📋</div></div>`;
+        }
+
+        function showLeaderboardPage() {
+            const sortedUsers = [...users].sort((a, b) => b.points - a.points).slice(0, 10);
+            return `<h1>Leaderboard</h1><div class="parking-card">${sortedUsers.map((u, i) => `<div class="leaderboard-item ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}"><span>#${i+1} ${u.name}</span><span>${u.points} pts</span></div>`).join('')}</div>`;
+        }
+
+        function showPremiumPage() {
+            if (!currentUser) return `<div class="form-container"><h2>Premium</h2><p>Please login.</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            return `<h1>Premium Membership</h1><div class="parking-grid"><div class="parking-card"><h3>Free</h3><p>$0/month</p><p>Basic features</p><p>Regular points</p></div><div class="parking-card popular"><h3>Premium</h3><p>$9.99/month</p><p>2x points</p><p>10% discount</p><p>Priority support</p><button class="btn btn-primary" onclick="upgradeToPremium()">Upgrade Now</button></div></div>`;
+        }
+
+        function upgradeToPremium() {
+            if (!currentUser) return;
+            currentUser.subscription = "premium";
+            showAlert("Upgraded to Premium! 🎉", "success");
+            showPage(currentPage);
+        }
+
+        function showEventsPage() {
+            return `<h1>Events</h1><div class="parking-grid">${events.map(e => `<div class="parking-card"><h3>${e.name}</h3><p>${e.discount}% OFF</p><p>${new Date(e.date).toLocaleDateString()}</p><button class="btn btn-primary" onclick="showAlert('Registered for ${e.name}!')">Register</button></div>`).join('')}</div>`;
+        }
+
+        function showCarbonPage() {
+            if (!currentUser) return `<div class="form-container"><h2>Carbon Tracker</h2><p>Please login.</p><button class="btn btn-primary" onclick="showLoginModal()">Login</button></div>`;
+            const saved = carbonFootprints.filter(c => c.userId === currentUser.id).reduce((s, c) => s + c.carbonSaved, 0);
+            return `<h1>Carbon Tracker</h1><div class="dashboard-stats"><div class="stat-card"><div class="stat-value">${saved}</div><div>kg CO₂ Saved</div></div><div class="stat-card"><div class="stat-value">${Math.floor(saved / 10)}</div><div>Trees Equivalent</div></div></div>`;
+        }
+
+        function showPage(page) {
+            currentPage = page;
+            const app = document.getElementById("app");
+            switch(page) {
+                case "dashboard": app.innerHTML = showDashboardPage(); break;
+                case "parking": app.innerHTML = showParkingPage(); setTimeout(() => filterParking(), 100); break;
+                case "bookings": app.innerHTML = showBookingsPage(); break;
+                case "profile": app.innerHTML = showProfilePage(); break;
+                case "achievements": app.innerHTML = showAchievementsPage(); break;
+                case "referrals": app.innerHTML = showReferralsPage(); break;
+                case "leaderboard": app.innerHTML = showLeaderboardPage(); break;
+                case "premium": app.innerHTML = showPremiumPage(); break;
+                case "events": app.innerHTML = showEventsPage(); break;
+                case "carbon": app.innerHTML = showCarbonPage(); break;
+                default: app.innerHTML = showDashboardPage();
+            }
+        }
+
+        // Make functions global
+        window.bookSlot = bookSlot;
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.processPayment = processPayment;
+        window.cancelBooking = cancelBooking;
+        window.downloadReceipt = downloadReceipt;
+        window.showQRCode = showQRCode;
+        window.filterParking = filterParking;
+        window.showPage = showPage;
+        window.handleAuth = handleAuth;
+        window.login = login;
+        window.register = register;
+        window.closeModal = closeModal;
+        window.showRegisterModal = showRegisterModal;
+        window.updateProfile = updateProfile;
+        window.upgradeToPremium = upgradeToPremium;
+        window.toggleTheme = toggleTheme;
+        window.toggleChatbot = toggleChatbot;
+        window.sendChatMessage = sendChatMessage;
+        window.sendQuickReply = sendQuickReply;
+        window.handleChatKeypress = handleChatKeypress;
+
+        loadTheme();
+        showPage("dashboard");
+    </script>
+</body>
+</html>
